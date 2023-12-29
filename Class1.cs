@@ -5,8 +5,8 @@ using UnityEngine.Networking;
 using System;
 using UnityEngine.SceneManagement;
 using Il2CppConcertXR;
-//using System.Reflection;
-//using Il2Cpp;
+using System.Reflection;
+using System.Diagnostics;
 using UnhollowerBaseLib;
 
 
@@ -75,7 +75,17 @@ namespace TestMod
                 return false; // Skip the original method (we've already provided the result)
             }
         }*/
+    [HarmonyPatch(typeof(StackFrame), "GetMethod")]
+    public class PatchStackTraceGetMethod
+    {
+        public static MethodInfo MethodToReplace;
 
+        public static void Postfix(ref MethodBase __result)
+        {
+            if (__result.DeclaringType == typeof(RuntimeMethodHandle))
+                __result = MethodToReplace ?? MethodBase.GetCurrentMethod();
+        }
+    }
     [HarmonyPatch(typeof(SceneManager))]
     [HarmonyPatch("LoadScene", new Type[] { typeof(string) })]
     class PatchSceneManagerLoadScene
@@ -394,7 +404,7 @@ namespace TestMod
         public override void OnSceneWasInitialized(int buildindex, string sceneName) // Runs when a Scene has Initialized and is passed the Scene's Build Index and Name.
         {
             MelonLogger.Msg("😘😘  OnSceneWasInitialized: " + buildindex.ToString() + " | " + sceneName);
-            foreach (Type type in Assembly.GetExecutingAssembly().GetTypes())
+           /*foreach (Type type in Assembly.GetExecutingAssembly().GetTypes())
             {
                 MelonLogger.Msg(type.FullName);
 
@@ -406,7 +416,7 @@ namespace TestMod
                         Debug.Log("Method: " + method.Name);
                     }
                 }
-            }
+            }*/
         }
 
         public override void OnSceneWasUnloaded(int buildIndex, string sceneName)
