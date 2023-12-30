@@ -1,7 +1,6 @@
 ﻿using MelonLoader;
 using UnityEngine;
 using HarmonyLib;
-using UnityEngine.Networking;
 using System;
 using UnityEngine.SceneManagement;
 using Il2CppConcertXR;
@@ -79,7 +78,7 @@ namespace TestMod
 
 
 
-    [HarmonyPatch(typeof(System.Net.Sockets.Socket))]
+   /* [HarmonyPatch(typeof(System.Net.Sockets.Socket))]
     [HarmonyPatch("Send", new Type[] { typeof(byte[]), typeof(int), typeof(int), typeof(System.Net.Sockets.SocketFlags) })]
     public class SocketSendPatch
     {
@@ -92,7 +91,7 @@ namespace TestMod
         }
     }
 
-
+    */
 
 
 
@@ -194,7 +193,19 @@ namespace TestMod
         public static void StartPostfix()
         {
             MelonLogger.Msg("HELLO - Start method called in AppLauncher");
+            foreach (Type type in System.Reflection.Assembly.GetExecutingAssembly().GetTypes())
+            {
+                MelonLogger.Msg(type.FullName);
 
+                if (type.FullName == "Il2Cpp.AppManager")
+                {
+                    MelonLogger.Msg("AppManager found: " + type.AssemblyQualifiedName);
+                    foreach (var method in type.GetMethods())
+                    {
+                        MelonLogger.Msg("Method: " + method.Name);
+                    }
+                }
+            }
 
 
         }
@@ -340,19 +351,7 @@ namespace TestMod
         public override void OnSceneWasInitialized(int buildindex, string sceneName) // Runs when a Scene has Initialized and is passed the Scene's Build Index and Name.
         {
             MelonLogger.Msg("😘😘  OnSceneWasInitialized: " + buildindex.ToString() + " | " + sceneName);
-           /*foreach (Type type in Assembly.GetExecutingAssembly().GetTypes())
-            {
-                MelonLogger.Msg(type.FullName);
-
-                if (type.FullName == "Il2Cpp.AppManager")
-                {
-                    Debug.Log("AppManager found: " + type.AssemblyQualifiedName);
-                    foreach (var method in type.GetMethods())
-                    {
-                        Debug.Log("Method: " + method.Name);
-                    }
-                }
-            }*/
+           
         }
 
         public override void OnSceneWasUnloaded(int buildIndex, string sceneName)

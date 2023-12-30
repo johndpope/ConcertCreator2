@@ -87,7 +87,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <PostBuildEvent>
-copy /Y "$(TargetPath)" "C:\Users\admin\AppData\Local\Programs\Concert Creator\Mods"
+xcopy /q /Y  "$(TargetPath)" "C:\Users\admin\AppData\Local\Programs\Concert Creator\Mods"
 </PostBuildEvent>
   </PropertyGroup>
 </Project>
