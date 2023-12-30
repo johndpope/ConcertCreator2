@@ -7,59 +7,7 @@ using UnityEngine.SceneManagement;
 using Il2CppConcertXR;
 using System.Reflection;
 using System.Diagnostics;
-using UnhollowerBaseLib;
 
-
-
-namespace Il2Cpp
-{
-    /* public class AppManager : MonoBehaviour
-     {
-         // ... [Other members and methods]
-         private static IntPtr newPointerValue; // Declaration of the new variable
-         // This method is called when the script instance is being loaded.
-         public unsafe void Awake()
-         {
-             // Original Awake code
-             // ...
-             MelonLogger.Msg("❤️❤️   Awake");
-             // Update the pointer for the offlineMode field to a new value
-             //IntPtr newPointer = GetNewPointerForOfflineMode(); // Replace with actual method to get the new pointer
-             //TestMod.ChangeOfflineModePointer(newPointer);
-
-
-         }
-
-         public static void ChangeOfflineModePointer(IntPtr newPointer)
-         {
-             // Get the type that contains the field
-             Type appManagerType = typeof(Il2Cpp.AppManager); // Adjust with the correct namespace and class
-
-             // Get the field information for the 'NativeFieldInfoPtr_offlineMode' field
-             FieldInfo fieldInfo = appManagerType.GetField("NativeFieldInfoPtr_offlineMode", BindingFlags.Static | BindingFlags.NonPublic);
-
-             // Remove the readonly modifier from the field
-             FieldInfo modifiersFieldInfo = typeof(FieldInfo).GetField("attrs", BindingFlags.Instance | BindingFlags.NonPublic);
-             object attrsValue = modifiersFieldInfo.GetValue(fieldInfo);
-             int newAttrsValue = (int)attrsValue & ~((int)FieldAttributes.InitOnly);
-             modifiersFieldInfo.SetValue(fieldInfo, newAttrsValue);
-
-             // Set the new value for the field
-             fieldInfo.SetValue(null, newPointer);
-         }
-
-
-         // Dummy method to represent obtaining the new pointer
-         // Replace this with the actual way you're determining the new pointer value
-         private IntPtr GetNewPointerForOfflineMode()
-         {
-             // Logic to determine the new pointer value
-             return new IntPtr(0); // Dummy value
-         }
-
-         // ... [Other members and methods]
-     }*/
-}
 namespace TestMod
 {
 
@@ -92,7 +40,7 @@ namespace TestMod
     {
         static void Prefix(string sceneName)
         {
-            Debug.Log($"Loading scene: {sceneName}");
+            MelonLogger.Msg($"Loading scene: {sceneName}");
         }
     }
     /*
@@ -146,18 +94,6 @@ namespace TestMod
 
 
 
-
-    [HarmonyPatch(typeof(System.Net.HttpWebRequest))]
-    [HarmonyPatch("GetResponse")]
-    public class HttpWebRequestGetResponsePatch
-    {
-        [HarmonyPrefix]
-        static void Prefix(System.Net.HttpWebRequest __instance)
-        {
-            // Log the request URL and method
-            MelonLogger.Msg($"Getting response for HTTP request to {__instance.RequestUri} with method {__instance.Method}");
-        }
-    }
 
 
     /*
@@ -271,7 +207,7 @@ namespace TestMod
     }
 
 
-    [HarmonyPatch(typeof(DownloadHandler))]
+   /* [HarmonyPatch(typeof(DownloadHandler))]
     [HarmonyPatch("ReceiveData")]
     public class DownloadHandlerReceiveDataPatch
     {
@@ -313,7 +249,7 @@ namespace TestMod
             }
             // Add more logging or manipulation as needed
         }
-    }
+    }*/
 
     /* [HarmonyPatch(typeof(System.Net.ServicePointManager))]
      [HarmonyPatch("ServerCertificateValidationCallback")]
