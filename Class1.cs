@@ -19,7 +19,12 @@ using Il2CppType = Il2CppInterop.Runtime.Il2CppType;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using System.Collections.Generic;
-using Il2CppSystem.Reflection;
+using Il2CppUIWidgets;
+//using Il2CppSystem.Reflection;
+//using BindingFlags = System.Reflection.BindingFlags;
+//using FieldAttributes = Il2CppSystem.Reflection.FieldAttributes;
+//using FieldInfo = Il2CppSystem.Reflection.FieldInfo;
+//using PropertyInfo = Il2CppSystem.Reflection.PropertyInfo;
 
 
 namespace TestMod
@@ -28,19 +33,19 @@ namespace TestMod
 {
 
     // Patch for HttpClient.SendAsync
-  /*  [HarmonyPatch(typeof(HttpClient), "SendAsync")]
-    public class HttpClientSendAsyncPatch
-    {
-        static void Prefix(HttpRequestMessage request)
-        {
-            Console.WriteLine($"HttpClient is sending a request to {request.RequestUri}");
-        }
+    /*  [HarmonyPatch(typeof(HttpClient), "SendAsync")]
+      public class HttpClientSendAsyncPatch
+      {
+          static void Prefix(HttpRequestMessage request)
+          {
+              Console.WriteLine($"HttpClient is sending a request to {request.RequestUri}");
+          }
 
-        static void Postfix(HttpRequestMessage request, HttpResponseMessage __result)
-        {
-            Console.WriteLine($"HttpClient received response for {request.RequestUri} with status: {__result.StatusCode}");
-        }
-    }*/
+          static void Postfix(HttpRequestMessage request, HttpResponseMessage __result)
+          {
+              Console.WriteLine($"HttpClient received response for {request.RequestUri} with status: {__result.StatusCode}");
+          }
+      }*/
 
     // Patch for WebRequest.GetResponse
     [HarmonyPatch(typeof(WebRequest), "GetResponse")]
@@ -99,53 +104,6 @@ namespace TestMod
         }
     }
 
-    public static class FieldUpdater
-    {
-
-        public static void ChangeOfflineModePointer(IntPtr newPointer)
-        {
-            // Get the type that contains the field
-            Type appManagerType = typeof(Il2Cpp.AppManager); // Adjust with the correct namespace and class
-
-            // Get the field information for the 'NativeFieldInfoPtr_offlineMode' field
-            FieldInfo fieldInfo = appManagerType.GetField("NativeFieldInfoPtr_offlineMode", BindingFlags.Static | BindingFlags.NonPublic);
-
-            // Remove the readonly modifier from the field
-            FieldInfo modifiersFieldInfo = typeof(FieldInfo).GetField("attrs", BindingFlags.Instance | BindingFlags.NonPublic);
-            object attrsValue = modifiersFieldInfo.GetValue(fieldInfo);
-            int newAttrsValue = (int)attrsValue & ~((int)FieldAttributes.InitOnly);
-            modifiersFieldInfo.SetValue(fieldInfo, newAttrsValue);
-
-            // Set the new value for the field
-            fieldInfo.SetValue(null, newPointer);
-        }
-        public static void ChangeFieldPointer(string fieldName, IntPtr newPointer)
-        {
-            // Get the type that contains the field
-            Type appManagerType = typeof(Il2Cpp.AppManager); // Adjust with the correct namespace and class
-
-            // Get the field information for the specified field
-            FieldInfo fieldInfo = appManagerType.GetField(fieldName, BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
-
-            if (fieldInfo == null)
-            {
-                throw new InvalidOperationException($"Field {fieldName} not found in {appManagerType.FullName}");
-            }
-
-            // Remove the readonly modifier from the field (if it's present)
-            FieldInfo modifiersFieldInfo = typeof(FieldInfo).GetField("attrs", BindingFlags.Instance | BindingFlags.NonPublic);
-            if (modifiersFieldInfo != null)
-            {
-                object attrsValue = modifiersFieldInfo.GetValue(fieldInfo);
-                int newAttrsValue = (int)attrsValue & ~((int)FieldAttributes.InitOnly);
-                modifiersFieldInfo.SetValue(fieldInfo, newAttrsValue);
-            }
-
-            // Set the new value for the field
-            fieldInfo.SetValue(null, newPointer);
-        }
-    }
-   
 
     [HarmonyPatch(typeof(SceneManager))]
     [HarmonyPatch("LoadScene", new Type[] { typeof(string) })]
@@ -158,16 +116,7 @@ namespace TestMod
     }
 
 
-    [HarmonyPatch(typeof(Input))]
-    [HarmonyPatch("GetKeyDown", new Type[] { typeof(KeyCode) })]
-    public class InputGetKeyDownPatch
-    {
-        [HarmonyPrefix]
-        static void Prefix(KeyCode key)
-        {
-            MelonLogger.Msg($"Key Down Detected: {key}");
-        }
-    }
+   
 
     /* [HarmonyPatch(typeof(System.Net.Dns))]
      [HarmonyPatch("GetHostAddresses")]
@@ -197,7 +146,7 @@ namespace TestMod
 
      */
 
- 
+
 
     [HarmonyPatch]
     public static class ServerConfigPatches
@@ -222,90 +171,91 @@ namespace TestMod
         // Similar patches for other properties and methods...
 
         // Patch for GetIP method
-        [HarmonyPatch(typeof(ServerConfig), "GetIP")]
-        [HarmonyPrefix]
-        public static void GetIPPrefix()
-        {
-            // Your logging code here for before the GetIP is called
-        }
+        /*  [HarmonyPatch(typeof(ServerConfig), "GetIP")]
+          [HarmonyPrefix]
+          public static void GetIPPrefix()
+          {
+              // Your logging code here for before the GetIP is called
+          }
 
-        [HarmonyPatch(typeof(ServerConfig), "GetIP")]
-        [HarmonyPostfix]
-        public static void GetIPPostfix(string __result)
-        {
-            // Your logging code here for after the GetIP is called
-            // __result contains the value returned by GetIP
-            MelonLogger.Msg(__result);
-        }
+          [HarmonyPatch(typeof(ServerConfig), "GetIP")]
+          [HarmonyPostfix]
+          public static void GetIPPostfix(string __result)
+          {
+              // Your logging code here for after the GetIP is called
+              // __result contains the value returned by GetIP
+              MelonLogger.Msg(__result);
+          }
 
-        // Similar patches for other methods...
-        // Patch for fayezIP property getter
-        [HarmonyPatch(typeof(ServerConfig), "fayezIP", MethodType.Getter)]
-        [HarmonyPrefix]
-        public static void FayezIPGetterPrefix()
-        {
-            MelonLogger.Msg("Before getting fayezIP");
-        }
+          // Similar patches for other methods...
+          // Patch for fayezIP property getter
+          [HarmonyPatch(typeof(ServerConfig), "fayezIP", MethodType.Getter)]
+          [HarmonyPrefix]
+          public static void FayezIPGetterPrefix()
+          {
+              MelonLogger.Msg("Before getting fayezIP");
+          }
 
-        [HarmonyPatch(typeof(ServerConfig), "fayezIP", MethodType.Getter)]
-        [HarmonyPostfix]
-        public static void FayezIPGetterPostfix(string __result)
-        {
-            MelonLogger.Msg($"After getting fayezIP: {__result}");
-        }
+          [HarmonyPatch(typeof(ServerConfig), "fayezIP", MethodType.Getter)]
+          [HarmonyPostfix]
+          public static void FayezIPGetterPostfix(string __result)
+          {
+              MelonLogger.Msg($"After getting fayezIP: {__result}");
+          }
 
-        // Patch for localIP property getter
-        [HarmonyPatch(typeof(ServerConfig), "localIP", MethodType.Getter)]
-        [HarmonyPrefix]
-        public static void LocalIPGetterPrefix()
-        {
-            MelonLogger.Msg("Before getting localIP");
-        }
+          // Patch for localIP property getter
+          [HarmonyPatch(typeof(ServerConfig), "localIP", MethodType.Getter)]
+          [HarmonyPrefix]
+          public static void LocalIPGetterPrefix()
+          {
+              MelonLogger.Msg("Before getting localIP");
+          }
 
-        [HarmonyPatch(typeof(ServerConfig), "localIP", MethodType.Getter)]
-        [HarmonyPostfix]
-        public static void LocalIPGetterPostfix(string __result)
-        {
-            __result = "127.0.0.1";
-            MelonLogger.Msg($"After getting localIP: {__result}");
-        }
+          [HarmonyPatch(typeof(ServerConfig), "localIP", MethodType.Getter)]
+          [HarmonyPostfix]
+          public static void LocalIPGetterPostfix(string __result)
+          {
+              __result = "127.0.0.1";
+              MelonLogger.Msg($"After getting localIP: {__result}");
+          }
 
-        // Patch for httpURL property getter
-        [HarmonyPatch(typeof(ServerConfig), "httpURL", MethodType.Getter)]
-        [HarmonyPrefix]
-        public static void HttpURLGetterPrefix()
-        {
-            MelonLogger.Msg("Before getting httpURL");
-        }
+          // Patch for httpURL property getter
+          [HarmonyPatch(typeof(ServerConfig), "httpURL", MethodType.Getter)]
+          [HarmonyPrefix]
+          public static void HttpURLGetterPrefix()
+          {
+              MelonLogger.Msg("Before getting httpURL");
+          }
 
-        [HarmonyPatch(typeof(ServerConfig), "httpURL", MethodType.Getter)]
-        [HarmonyPostfix]
-        public static void HttpURLGetterPostfix(string __result)
-        {
-            // Override the result
-            __result = "http://localhost:8080";
+          [HarmonyPatch(typeof(ServerConfig), "httpURL", MethodType.Getter)]
+          [HarmonyPostfix]
+          public static void HttpURLGetterPostfix(string __result)
+          {
+              // Override the result
+              __result = "http://localhost:8080";
 
-            // If you're using MelonLoader for modding Unity games, you might have MelonLogger for logging
-            MelonLogger.Msg("Original GetIP result: " + __result);
-            MelonLogger.Msg("New GetIP result: http://127.0.0.1:8080");
-        }
+              // If you're using MelonLoader for modding Unity games, you might have MelonLogger for logging
+              MelonLogger.Msg("Original GetIP result: " + __result);
+              MelonLogger.Msg("New GetIP result: http://127.0.0.1:8080");
+          }
 
-        // Patch for socketURL property getter
-        [HarmonyPatch(typeof(ServerConfig), "socketURL", MethodType.Getter)]
-        [HarmonyPrefix]
-        public static void SocketURLGetterPrefix()
-        {
-            MelonLogger.Msg("Before getting socketURL");
-        }
+          // Patch for socketURL property getter
+          [HarmonyPatch(typeof(ServerConfig), "socketURL", MethodType.Getter)]
+          [HarmonyPrefix]
+          public static void SocketURLGetterPrefix()
+          {
+              MelonLogger.Msg("Before getting socketURL");
+          }
 
-        [HarmonyPatch(typeof(ServerConfig), "socketURL", MethodType.Getter)]
-        [HarmonyPostfix]
-        public static void SocketURLGetterPostfix(string __result)
-        {
-            MelonLogger.Msg($"After getting socketURL: {__result}");
-        }
+          [HarmonyPatch(typeof(ServerConfig), "socketURL", MethodType.Getter)]
+          [HarmonyPostfix]
+          public static void SocketURLGetterPostfix(string __result)
+          {
+              MelonLogger.Msg($"After getting socketURL: {__result}");
+          }
 
-      
+        */
+
     }
 
 
@@ -352,8 +302,8 @@ namespace TestMod
         {
             // You can put your custom logic here. For example, modify the __result as needed:
             // __result = new EnhancedEvent(); // Initialize it as you need
-          //  MelonLogger.Msg("__result:", __result);
-            
+            //  MelonLogger.Msg("__result:", __result);
+
 
             // Returning false means the original method will be skipped
             return false;
@@ -389,28 +339,62 @@ namespace TestMod
             var prefix = typeof(OfflineModePatch).GetMethod("Prefix");
             harmony.Patch(original, new HarmonyMethod(prefix));
         }
-        
+
     }
-    
- /*   [HarmonyPatch(typeof(SceneManager))]
-    [HarmonyPatch(typeof(ServerManager), "__u__1")]
-    public class ServerManagerPatchClass
+
+
+    [HarmonyPatch(typeof(ServerResponse))]
+    public class ServerResponsePatch
     {
 
-        [HarmonyPostfix]
-        public static void Postfix(ref ServerResponse __result)
+        /* [HarmonyPatch(typeof(ServerResponse), "get_IsFaulty")]
+         static void Postfix(ref bool __result)
+         {
+             MelonLogger.Msg($"Original IsOk result: {__result}");
+
+             // Change __result to whatever value you want, like false to indicate no fault.
+             __result = false;
+         }
+        */
+
+        [HarmonyPatch("get_IsOk"), HarmonyPostfix]
+        public static void IsOkPostfix(ServerResponse __instance, ref bool __result)
         {
-            // Create a new ServerResponse with desired properties or modify __result directly.
-            MelonLogger.Msg($" server response __result ---------- {__result}");
-            __result = new ServerResponse(); // Customize this as needed.
+            // Log the original result and any relevant information from the instance.
+            MelonLogger.Msg($"Original IsOk result: {__result}, ServerResponse status: {__instance.status}");
+
+            // Override the result of the IsOk getter to always be true.
+            __result = true;
+
+            __instance.status = (Il2CppSystem.Net.HttpStatusCode)HttpStatusCode.OK;
+            // Log the new overridden result.
+            MelonLogger.Msg($"New IsOk result: {__result}");
+            MelonLogger.Msg($"Original IsOk result: {__result}, ServerResponse status: {__instance.status}");
         }
 
-        [HarmonyPostfix]
-        public static void Postfix(Il2CppSystem.Runtime.CompilerServices.TaskAwaiter<ServerResponse> __u__1)
-        {
-            MelonLogger.Msg($" server response ---------- {__u__1}");
-        }
-    }*/
+
+    }
+
+
+    /*   [HarmonyPatch(typeof(SceneManager))]
+       [HarmonyPatch(typeof(ServerManager), "__u__1")]
+       public class ServerManagerPatchClass
+       {
+
+           [HarmonyPostfix]
+           public static void Postfix(ref ServerResponse __result)
+           {
+               // Create a new ServerResponse with desired properties or modify __result directly.
+               MelonLogger.Msg($" server response __result ---------- {__result}");
+               __result = new ServerResponse(); // Customize this as needed.
+           }
+
+           [HarmonyPostfix]
+           public static void Postfix(Il2CppSystem.Runtime.CompilerServices.TaskAwaiter<ServerResponse> __u__1)
+           {
+               MelonLogger.Msg($" server response ---------- {__u__1}");
+           }
+       }*/
     public class CanvasFinder : MonoBehaviour
     {
         public void Start()
@@ -446,45 +430,40 @@ namespace TestMod
 
         private static IntPtr newPointerValue; // Declaration of the new variable
 
-        /* public static void ChangeReadyToPlayPointer(IntPtr newPointer)
-         {
-             // Get the type that contains the field
-             Type appLauncherType = typeof(Il2CppConcertXR.AppLauncher); // Adjust with the correct namespace and class
 
-             // Get the field information for the 'NativeFieldInfoPtr_readyToPlay' field
-             FieldInfo fieldInfo = appLauncherType.GetField("NativeFieldInfoPtr_readyToPlay", BindingFlags.Static | BindingFlags.NonPublic);
 
-             // Remove the readonly modifier
-             FieldInfo modifiersFieldInfo = typeof(FieldInfo).GetField("attrs", BindingFlags.Instance | BindingFlags.NonPublic);
-             modifiersFieldInfo.SetValue(fieldInfo, (int)fieldInfo.Attributes & ~((int)FieldAttributes.InitOnly));
-
-             // Set the new value
-             fieldInfo.SetValue(null, newPointer);
-         }
-        */
-
-        public static Assembly _assembly;
         public override void OnInitializeMelon()
         {
 
 
 
             MelonLogger.Msg("OnApplicationStart");
-          
+
 
 
             // MelonLogger.Msg("currentCanvas :", test.ToString());
             var harmony = new HarmonyLib.Harmony("com.yourname.modname");
-            harmony.PatchAll(); 
+            harmony.PatchAll();
             //OfflineModePatch.ApplyPatch();
-            ReadyToPlayPatch.ApplyPatch();
+           // ReadyToPlayPatch.ApplyPatch();
             MelonLogger.Msg("Patches applied!");
 
-          //  
+
+            //  
 
 
         }
 
+        public override void OnUpdate()
+        {
+          //  base.OnUpdate();
+            if (Input.GetKeyDown(KeyCode.C))
+            {
+                // MelonLogger.Msg("update");
+
+                DestroyView();
+            }
+        }
         public override void OnLateInitializeMelon() // Runs after OnApplicationStart.
         {
             MelonLogger.Msg("OnApplicationLateStart");
@@ -531,6 +510,8 @@ namespace TestMod
         {
             MelonLogger.Msg("STEP 1.  OnSceneWasLoaded: " + buildindex.ToString() + " | " + sceneName);
             ServerLoaderManager.instance.SubscriptionChecked(true);
+
+         
             // App Manager - can't override isoffline
             // LogAllMembers(AppManager.instance);
             //UnsafeStaticModifier.ModifyReadOnlyField(typeof(Il2Cpp.AppManager), "NativeFieldInfoPtr_offlineMode", new IntPtr(100666249));
@@ -539,43 +520,10 @@ namespace TestMod
             //MelonLogger.Msg("we did it!");
 
 
-            foreach (GameObject obj in UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects())
-            {
-                MelonLogger.Msg("GameObject: " + obj.name);
-                if(obj.activeInHierarchy == true)
-                {
-                    
-                    {
-                      
-                        if (obj.name == "ServerLoaderUI") //|| obj.name == "Purchaser" || obj.name == "FrontendScripts" || obj.name == "VR"
-                        {
-                            MelonLogger.Msg("~~~~~~~~~~~activeInHierarchy GameObject: " + obj.name);
-                            foreach (Component comp in obj.GetComponents<Component>())
-                            {
-                                MelonLogger.Msg($"---  {comp.GetType()}");
-                                foreach (var method in comp.GetType().GetMethods())
-                                {
-                                    MelonLogger.Msg($"------->  {method.Name}");
-                                }
-                            }
-                            obj.SetActive(false);
-                           UnityEngine.Object.Destroy(obj); // This destroys the Canvas
 
-                            //Destroy(ServerLoaderManager.instance.gameObject);
-                            ServerLoaderManager.instance.SubscriptionChecked(true);
-                            ServerLoaderManager.instance.Hide();
-                            ServerLoaderManager.instance._Hide_b__6_0();
 
-                            //ServerLoaderManager.instance = null;
-                        }
+            // Add more details about 'obj' as needed
 
-                       /**/
-                    }
-                }
-              
-               
-                // Add more details about 'obj' as needed
-            }
         }
         public static System.Collections.Generic.IEnumerable<T> FindObjectsOfType<T>() where T : Component
         {
@@ -586,20 +534,135 @@ namespace TestMod
         {
             return UnityEngine.Object.FindObjectOfType<T>();
         }
+
+        public void DestroyView()
+        {
+
+            MelonLogger.Msg("------------------DestroyView");
+            foreach (UnityEngine.GameObject obj in GameObject.FindObjectsOfType<UnityEngine.GameObject>().ToList())
+
+            {
+                // Construct a path to the object
+                string path = obj.name;
+                Transform parent = obj.transform.parent;
+                while (parent != null)
+                {
+                    path = parent.name + "/" + path;
+                    parent = parent.parent;
+                }
+                MelonLogger.Msg(path);
+            }
+
+            GameObject alertView = GameObject.Find("UIAlertView");
+            if (alertView != null)
+            {
+                // Perform operations on alertView here
+                // For example, to disable it:
+                alertView.SetActive(false);
+            }
+            /*
+            Scene active = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+            MelonLogger.Msg("destroy active: " + active);
+            CanvasFinder cf = new CanvasFinder();
+            Canvas currentCanvas = cf.GetCurrentCanvas();
+            if (currentCanvas != null)
+            {
+                //// This deactivates the Canvas
+                MelonLogger.Msg("found currentCanvas attempting to remove");
+                LogAllMembers(currentCanvas.gameObject);
+               
+            }
+
+            foreach (GameObject obj in active.GetRootGameObjects())
+            {
+                MelonLogger.Msg("GameObject: " + obj.name);
+
+                //   if (obj.activeInHierarchy == true)
+                {
+
+                    foreach (Component comp in obj.GetComponents<Component>())
+                    {
+                        MelonLogger.Msg($"---  {comp.GetType()}");
+                        foreach (var method in comp.GetType().GetMethods())
+                        {
+                            MelonLogger.Msg($"------->  {method.Name}");
+                        }
+                    }
+
+
+                  
+
+                }
+                //   UnityEngine.Object.Destroy(obj); // This destroys the Canvas
+                obj.active = !obj.active;
+                return;
+              //  currentCanvas.gameObject.set(false);
+            }*/
+        }
+        public void DebugView()
+        {
+            Scene active = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+            MelonLogger.Msg("active: " + active);
+            foreach (GameObject obj in active.GetRootGameObjects())
+            {
+                MelonLogger.Msg("GameObject: " + obj.name);
+                //   if (obj.activeInHierarchy == true)
+                {
+
+
+
+
+                    if (obj.name == "ServerLoaderUI") //|| obj.name == "Purchaser" || obj.name == "FrontendScripts" || obj.name == "VR"
+                    {
+                        MelonLogger.Msg("~~~~~~~~~~~activeInHierarchy GameObject: " + obj.name);
+                        foreach (Component comp in obj.GetComponents<Component>())
+                        {
+                            MelonLogger.Msg($"---  {comp.GetType()}");
+                            foreach (var method in comp.GetType().GetMethods())
+                            {
+                                MelonLogger.Msg($"------->  {method.Name}");
+                            }
+                        }
+                        obj.SetActive(false);
+                        UnityEngine.Object.Destroy(obj); // This destroys the Canvas
+
+                        //Destroy(ServerLoaderManager.instance.gameObject);
+                        ServerLoaderManager.instance.SubscriptionChecked(true);
+                        ServerLoaderManager.instance.Hide();
+                        ServerLoaderManager.instance._Hide_b__6_0();
+
+
+                        //ServerLoaderManager.instance = null;
+                    }
+
+
+
+                }
+            }
+        }
+
         public override void OnSceneWasInitialized(int buildindex, string sceneName) // Runs when a Scene has Initialized and is passed the Scene's Build Index and Name.
         {
             MelonLogger.Msg("STEP 2.  OnSceneWasInitialized: " + buildindex.ToString() + " | " + sceneName);
             //AppLauncher.instance.StopShowingSlidingScreen();
             LogAllMembers(AppLauncher.instance);
 
-            System.Collections.Generic.IEnumerable<UnityEngine.UI.Text>  texts = FindObjectsOfType<Text>();
-            foreach (var theText in texts)
+           // DebugUIBuilder.instance.enabled = true;
+
+
+            try
             {
-                if (theText.text.Contains("connecting"))
-                {
-                    MelonLogger.Msg($"Text found in object: {theText.gameObject} in scene: {theText.gameObject.scene.name}");
-                }
+                DebugView();
+                DebugView();
+              //  DebugView();
             }
+            catch (Exception ex)
+            {
+                MelonLogger.Msg("ex: " + ex);
+            }
+            
+
+
 
 
             /*
@@ -647,12 +710,13 @@ namespace TestMod
                  canvasObject.AddComponent<GraphicRaycaster>();
              }*/
 
+
             //  Debug.Log("Active Self: " + ConcertCreator.instance.MainUIRoot.activeSelf);
             //Debug.Log("Active in Hierarchy: " + ConcertCreator.instance.MainUIRoot.activeInHierarchy);
 
             // yourGameObject.SetActive(true);
+            //}
         }
-
         public override void OnSceneWasUnloaded(int buildIndex, string sceneName)
         {
             MelonLogger.Msg("OnSceneWasUnloaded: " + buildIndex.ToString() + " | " + sceneName);

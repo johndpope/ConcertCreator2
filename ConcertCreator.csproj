@@ -51,6 +51,11 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\AppData\Local\Programs\Concert Creator\Mods\Il2Cppmscorlib.dll</HintPath>
     </Reference>
+    <Reference Include="Il2CppSystem, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null" />
+    <Reference Include="Il2CppSystem.Core, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Downloads\UnityExplorer-master\UnityExplorer-master\lib\unhollowed\Il2CppSystem.Core.dll</HintPath>
+    </Reference>
     <Reference Include="MelonLoader">
       <HintPath>..\..\AppData\Local\Programs\Concert Creator\MelonLoader\net6\MelonLoader.dll</HintPath>
     </Reference>
@@ -79,9 +84,6 @@
     <Reference Include="UnityEngine.InputModule">
       <HintPath>..\..\Downloads\2021.1.0\UnityEngine.InputModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.JSONSerializeModule">
-      <HintPath>..\..\Downloads\2021.1.0\UnityEngine.JSONSerializeModule.dll</HintPath>
-    </Reference>
     <Reference Include="UnityEngine.UI, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\Downloads\UnityExplorer-master\UnityExplorer-master\lib\unhollowed\UnityEngine.UI.dll</HintPath>
@@ -98,9 +100,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\Downloads\2021.1.0\UnityEngine.UIModule.dll</HintPath>
     </Reference>
-    <Reference Include="UniverseLib.IL2CPP.Interop">
-      <HintPath>..\..\Downloads\UnityExplorer-master\UnityExplorer-master\Release\UnityExplorer.BepInEx.IL2CPP.CoreCLR\UniverseLib.IL2CPP.Interop.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Class1.cs" />
@@ -108,8 +107,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>
-    </PreBuildEvent>
+    <PreBuildEvent>"C:\Users\admin\AppData\Local\Programs\Concert Creator\test.bat"</PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <PostBuildEvent>xcopy /q /Y /f "$(TargetPath)" "C:\Users\admin\AppData\Local\Programs\Concert Creator\Mods" || exit /b
