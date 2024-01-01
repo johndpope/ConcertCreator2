@@ -20,6 +20,9 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using Il2CppUIWidgets;
+using static Il2Cpp.SceneLoader;
+using UnityEngine.PlayerLoop;
+using static Il2Cpp.Purchaser;
 //using Il2CppSystem.Reflection;
 //using BindingFlags = System.Reflection.BindingFlags;
 //using FieldAttributes = Il2CppSystem.Reflection.FieldAttributes;
@@ -395,6 +398,9 @@ namespace TestMod
                MelonLogger.Msg($" server response ---------- {__u__1}");
            }
        }*/
+
+
+
     public class CanvasFinder : MonoBehaviour
     {
         public void Start()
@@ -424,6 +430,35 @@ namespace TestMod
             }
             return null;
         }
+
+        [HarmonyPatch(typeof(SceneLoader))]
+        [HarmonyPatch("LoadCommons")]
+        class PatchForLoadCommons
+        {
+            static void Postfix()
+            {
+                // Your code here
+                MelonLogger.Msg("LoadCommons has been called via harmonypatch.");
+            }
+        }
+
+        [HarmonyPatch(typeof(UserFlowUI), "UserSignedOut")]
+        [HarmonyPrefix]
+        public static bool Prefix()
+        {
+            // Log or handle the call
+            Console.WriteLine("UserSignedOut method called");
+            return true; // return true to continue executing the original method
+        }
+        [HarmonyPatch(typeof(Purchaser), "_get_IsAnySubscriptionActive_b__21_0")]
+        [HarmonyPrefix]
+        public static bool Prefix(ProductInfo x)
+        {
+            // Your logging or handling code here
+            MelonLogger.Msg("x:"+ x);
+            return true;
+        }
+
     }
     public class TestMod : MelonMod
     {
@@ -535,23 +570,134 @@ namespace TestMod
             return UnityEngine.Object.FindObjectOfType<T>();
         }
 
+        int i = 0;
         public void DestroyView()
         {
 
+            // UserFlowUI.instance.ShowMidiRecordingImportScreen();
+
+            UserAuth.instance.CreateUser("john.pope@wweevv.app", "12341234", "jp");
+            UserAuth.instance.enabled = true;
+            PurchaseManager.instance.isPaying = true;
+
+          ///  Purchaser.instance.
+           // UserAuth.instance.FinalizeSignIn("jp");
+          //  UserAuth.instance.
+            // MelonLogger.Msg("------------------ MidiRecorder.instance:" + MidiRecorder.instance);
+            //   ConcertCreator.instance.userSignedIn();
+              UserFlowUI.instance.UserSignedIn();
+            UserFlowUI.instance.ImportFile();
+            
             MelonLogger.Msg("------------------DestroyView");
+           GameObject[] gObjects =  ConcertCreator.instance.HideLogInMenuButtons;
+
+            foreach (GameObject go in gObjects) {
+                MelonLogger.Msg("hidden: " + go.name);
+            }
             foreach (UnityEngine.GameObject obj in GameObject.FindObjectsOfType<UnityEngine.GameObject>().ToList())
 
             {
                 // Construct a path to the object
                 string path = obj.name;
+
+
                 Transform parent = obj.transform.parent;
                 while (parent != null)
                 {
                     path = parent.name + "/" + path;
                     parent = parent.parent;
                 }
-                MelonLogger.Msg(path);
+
+                if (obj.activeInHierarchy == true) {
+                    MelonLogger.Msg("name: " + obj.name);
+                  //  MelonLogger.Msg("activeInHierarchy: " + obj.activeInHierarchy);
+                }
+
+               
+
+
+                Canvas canvas = obj.GetComponentInParent<Canvas>();
+                CanvasGroup group = obj.GetComponentInParent<CanvasGroup>();
+                try
+                {
+
+                    // add debug label
+                   /* GameObject label = new GameObject("Label");
+                    label.transform.SetParent(obj.transform);
+
+                    Text text = label.AddComponent<Text>();
+                    text.text = obj.name;
+                    text.color = Color.black;
+
+                    // Set up border (using UI Image)
+                    Image border = label.AddComponent<Image>();
+                    border.color = Color.white;  // Set your border color here
+
+                    // Adjust the position and size
+                    label.transform.localPosition = Vector3.zero; // or any position you prefer
+                                                                  // Set other properties like size, font, alignment as needed*/
+                    MelonLogger.Msg("    Sorting Layer: " + canvas.sortingLayerName);
+                    MelonLogger.Msg("    Sorting Order: " + canvas.sortingOrder);
+                    if (group != null)
+                    {
+                        MelonLogger.Msg("    Alpha: " + group.alpha);
+                        group.alpha = 0.5f;
+                        MelonLogger.Msg("    Interactable: " + group.interactable);
+                    }
+                }catch (Exception e) { 
+                
+                }
+                Renderer renderer = obj.GetComponent<Renderer>();
+                if (renderer != null)
+                {
+                    Color color = renderer.material.color;
+                    color.a = 0.5f; // Set alpha to 50%. Adjust as needed.
+                    renderer.material.color = color;
+                }
+
+
+
+
+
+                /*
+                   // REPLACE SCENE
+                   for (int i = 0; i < SceneManager.sceneCount; i++)
+                   {
+                       Scene scene = SceneManager.GetSceneAt(i);
+                       MelonLogger.Msg("Loaded scene: " + scene.name);
+                   }
+                   //AvailableScenes
+                   MelonLogger.Msg("SceneManager.GetActiveScene().name: " + SceneManager.GetActiveScene().name);
+                   try
+                   {
+
+                       SceneLoader.LoadSceneAsync(i, true);
+                       i = i + 1;
+                       /*var allScenes = SceneManager.GetAllScenes();
+                       if (allScenes.Length > 0)
+                       {
+                           // var sceneName = allScenes[i];
+                           // SceneLoader.LoadSceneAsync(i, isSceneReplace: true);
+                           MelonLogger.Msg("allScenes[i].name: " + allScenes[i].name);
+                           SceneManager.SetActiveScene(allScenes[i]);
+                           i = i + 1;
+                       }
+                       else
+                       {
+                           MelonLogger.Msg("there is no other scenes !!!!!");
+                       }
+                       // SceneManager.UnloadSceneAsync(allScenes[i - 1]);
+                   }
+                   catch (Exception e)
+                   {
+                       MelonLogger.Msg("ex:" + e);
+                   }
+                  */
+                // LoadCommons();
+
+
             }
+
 
             GameObject alertView = GameObject.Find("UIAlertView");
             if (alertView != null)
