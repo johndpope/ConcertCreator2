@@ -23,6 +23,9 @@ using Il2CppUIWidgets;
 using static Il2Cpp.SceneLoader;
 using UnityEngine.PlayerLoop;
 using static Il2Cpp.Purchaser;
+
+using Il2CppFirebase;
+using static Il2Cpp.UserAuth;
 //using Il2CppSystem.Reflection;
 //using BindingFlags = System.Reflection.BindingFlags;
 //using FieldAttributes = Il2CppSystem.Reflection.FieldAttributes;
@@ -374,30 +377,10 @@ namespace TestMod
             MelonLogger.Msg($"New IsOk result: {__result}");
             MelonLogger.Msg($"Original IsOk result: {__result}, ServerResponse status: {__instance.status}");
         }
-
+    
 
     }
 
-
-    /*   [HarmonyPatch(typeof(SceneManager))]
-       [HarmonyPatch(typeof(ServerManager), "__u__1")]
-       public class ServerManagerPatchClass
-       {
-
-           [HarmonyPostfix]
-           public static void Postfix(ref ServerResponse __result)
-           {
-               // Create a new ServerResponse with desired properties or modify __result directly.
-               MelonLogger.Msg($" server response __result ---------- {__result}");
-               __result = new ServerResponse(); // Customize this as needed.
-           }
-
-           [HarmonyPostfix]
-           public static void Postfix(Il2CppSystem.Runtime.CompilerServices.TaskAwaiter<ServerResponse> __u__1)
-           {
-               MelonLogger.Msg($" server response ---------- {__u__1}");
-           }
-       }*/
 
 
 
@@ -442,14 +425,48 @@ namespace TestMod
             }
         }
 
-        [HarmonyPatch(typeof(UserFlowUI), "UserSignedOut")]
+        [HarmonyPatch(typeof(UserFlowUI), "ShowWelcomeScreen")]
         [HarmonyPrefix]
         public static bool Prefix()
         {
             // Log or handle the call
-            Console.WriteLine("UserSignedOut method called");
-            return true; // return true to continue executing the original method
+            MelonLogger.Msg("ABORT - UserSignedOut method called");
+            return false; // return true to continue executing the original method
         }
+
+        [HarmonyPatch(typeof(UserFlowUI), "CanImport")]
+        public static class CanImportPatch
+        {
+            // Prefix method to override the original behavior
+            [HarmonyPrefix]
+            public static bool Prefix(ref bool __result)
+            {
+                __result = true; // Set the result to true
+                return false; // Skip the original method
+            }
+        }
+
+        /*   
+           [HarmonyPatch(typeof(UserFlowUI), "ShowWelcomeScreen")]
+           [HarmonyPrefix]
+           public static bool Prefix()
+           {
+               // Log or handle the call
+               MelonLogger.Msg("ABORT - UserSignedOut method called");
+               return false; // return true to continue executing the original method
+           }
+        */
+
+
+
+        /* [HarmonyPatch(typeof(UserFlowUI), "UserSignedOut")]
+         [HarmonyPrefix]
+         public static bool Prefix()
+         {
+             // Log or handle the call
+             Console.WriteLine("UserSignedOut method called");
+             return true; // return true to continue executing the original method
+         }*/
         [HarmonyPatch(typeof(Purchaser), "_get_IsAnySubscriptionActive_b__21_0")]
         [HarmonyPrefix]
         public static bool Prefix(ProductInfo x)
@@ -459,7 +476,37 @@ namespace TestMod
             return true;
         }
 
+       
+        
+
     }
+
+    public class UserPopulation
+    {
+        public static void PopulateUser()
+        {
+            // Create a new Dictionary to represent the JSON object
+         /*   Il2CppSystem.Collections.Generic.Dictionary<string, Il2CppSystem.Object> jsn = new Il2CppSystem.Collections.Generic.Dictionary<string, Il2CppSystem.Object>();
+
+        
+            // Populate the dictionary with user attribute values
+            jsn["email"] =  Il2CppSystem.Convert.ToString("user@example.com");  // Replace with actual email
+            jsn["userID"] = new Il2CppSystem.Object("12345"); // Replace with actual user ID
+            jsn["displayName"] = new Il2CppSystem.Object("John Doe"); // Replace with actual display name
+            jsn["sourceReferral"] = new Il2CppSystem.Object("referralCode"); // Replace with actual source referral
+            jsn["partnerId"] = new Il2CppSystem.Object("partner123"); // Replace with actual partner ID
+            jsn["specialUser"] = new Il2CppSystem.Object(true); // Replace with actual special user status
+            jsn["ogUser"] = new Il2CppSystem.Object(false); // Replace with actual OG user status
+            jsn["fullAccess"] = new Il2CppSystem.Object(true); // Replace with actual full access status
+
+            // Invoke the FromJson method to populate the User object
+            User populatedUser = User.FromJson(jsn);*/
+
+            // Now populatedUser is filled with the data provided
+            // You can work with populatedUser as needed
+        }
+    }
+
     public class TestMod : MelonMod
     {
 
@@ -482,11 +529,16 @@ namespace TestMod
             //OfflineModePatch.ApplyPatch();
            // ReadyToPlayPatch.ApplyPatch();
             MelonLogger.Msg("Patches applied!");
+            //UserAuth.instance.SignInUser("bob@bob.com", "12341234");
 
-
-            //  
-
-
+            ////   ServerLoaderManager.instance.loaderUI.gameObject.SetActive(false);
+            // ServerLoaderManager.instance.SubscriptionChecked(true);
+        //    MelonLogger.Msg("masterPlayer:" + AppManager.instance.masterPlayer);
+        
+      
+           // myEvent.
+           // UserAuth.instance.userSignedIn = myEvent;
+          //  myEvent.fi
         }
 
         public override void OnUpdate()
@@ -544,8 +596,7 @@ namespace TestMod
         public override void OnSceneWasLoaded(int buildindex, string sceneName)
         {
             MelonLogger.Msg("STEP 1.  OnSceneWasLoaded: " + buildindex.ToString() + " | " + sceneName);
-            ServerLoaderManager.instance.SubscriptionChecked(true);
-
+          
          
             // App Manager - can't override isoffline
             // LogAllMembers(AppManager.instance);
@@ -570,6 +621,8 @@ namespace TestMod
             return UnityEngine.Object.FindObjectOfType<T>();
         }
 
+       
+
         int i = 0;
         public void DestroyView()
         {
@@ -579,14 +632,18 @@ namespace TestMod
             UserAuth.instance.CreateUser("john.pope@wweevv.app", "12341234", "jp");
             UserAuth.instance.enabled = true;
             PurchaseManager.instance.isPaying = true;
-
+            
+            //MelonLogger.Msg("------------------Firebase.FirebaseApp.DefaultInstance:"+ FirebaseApp.AppSetDefaultConfigPath()//.DefaultInstance.name);
+         //   Firebase.FirebaseApp.
           ///  Purchaser.instance.
+          ///  
            // UserAuth.instance.FinalizeSignIn("jp");
+
           //  UserAuth.instance.
             // MelonLogger.Msg("------------------ MidiRecorder.instance:" + MidiRecorder.instance);
             //   ConcertCreator.instance.userSignedIn();
               UserFlowUI.instance.UserSignedIn();
-            UserFlowUI.instance.ImportFile();
+         //   UserFlowUI.instance.OpenFileChoosingScreen();
             
             MelonLogger.Msg("------------------DestroyView");
            GameObject[] gObjects =  ConcertCreator.instance.HideLogInMenuButtons;
@@ -597,6 +654,7 @@ namespace TestMod
             foreach (UnityEngine.GameObject obj in GameObject.FindObjectsOfType<UnityEngine.GameObject>().ToList())
 
             {
+
                 // Construct a path to the object
                 string path = obj.name;
 
@@ -791,9 +849,23 @@ namespace TestMod
         {
             MelonLogger.Msg("STEP 2.  OnSceneWasInitialized: " + buildindex.ToString() + " | " + sceneName);
             //AppLauncher.instance.StopShowingSlidingScreen();
-            LogAllMembers(AppLauncher.instance);
+            //LogAllMembers(AppLauncher.instance);
+            User userAuth = new User();
+            userAuth.ogUser = true;
+            userAuth.partnerId = "12341234";
+            userAuth.email = "bob@bob.com";
+            userAuth.specialUser = true;
+            userAuth.displayName = "jp";
+            userAuth.userID = "123";
+            userAuth.fullAccess = true;
 
-           // DebugUIBuilder.instance.enabled = true;
+            UserAuth.instance.user = userAuth;
+            // UserAuth.instance.FinalizeSignIn("jp");
+            //EnhancedEvent myEvent = new EnhancedEvent();
+            //LogAllMembers(myEvent);
+            ServerLoaderManager.instance.SubscriptionChecked(true);
+
+            UserFlowUI.instance.ShowLinkImportScreen();
 
 
             try

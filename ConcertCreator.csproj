@@ -40,6 +40,10 @@
     <Reference Include="Assembly-CSharp">
       <HintPath>..\..\AppData\Local\Programs\Concert Creator\MelonLoader\Il2CppAssemblies\Assembly-CSharp.dll</HintPath>
     </Reference>
+    <Reference Include="Il2CppFirebase.App, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\AppData\Local\Programs\Concert Creator\MelonLoader\Il2CppAssemblies\Il2CppFirebase.App.dll</HintPath>
+    </Reference>
     <Reference Include="Il2CppInterop.HarmonySupport">
       <HintPath>..\..\AppData\Local\Programs\Concert Creator\MelonLoader\Dependencies\SupportModules\Il2CppInterop.HarmonySupport.dll</HintPath>
     </Reference>
