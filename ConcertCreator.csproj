@@ -88,6 +88,8 @@
     <Reference Include="UnityEngine.InputModule">
       <HintPath>..\..\Downloads\2021.1.0\UnityEngine.InputModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.Purchasing, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" />
+    <Reference Include="UnityEngine.Purchasing.Stores, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <Reference Include="UnityEngine.UI, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\Downloads\UnityExplorer-master\UnityExplorer-master\lib\unhollowed\UnityEngine.UI.dll</HintPath>

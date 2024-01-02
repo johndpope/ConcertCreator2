@@ -26,6 +26,7 @@ using static Il2Cpp.Purchaser;
 
 using Il2CppFirebase;
 using static Il2Cpp.UserAuth;
+using UnityEngine.Purchasing;
 //using Il2CppSystem.Reflection;
 //using BindingFlags = System.Reflection.BindingFlags;
 //using FieldAttributes = Il2CppSystem.Reflection.FieldAttributes;
@@ -157,27 +158,11 @@ namespace TestMod
     [HarmonyPatch]
     public static class ServerConfigPatches
     {
-        // Patch for anasIP property getter
-        [HarmonyPatch(typeof(ServerConfig), "anasIP", MethodType.Getter)]
-        [HarmonyPrefix]
-        public static void AnasIPGetterPrefix()
-        {
-            // Your logging code here for before the getter is called
-        }
-
-        [HarmonyPatch(typeof(ServerConfig), "anasIP", MethodType.Getter)]
-        [HarmonyPostfix]
-        public static void AnasIPGetterPostfix(string __result)
-        {
-            // Your logging code here for after the getter is called
-            // __result contains the value returned by the getter
-            MelonLogger.Msg(__result);
-        }
-
+       
         // Similar patches for other properties and methods...
 
         // Patch for GetIP method
-        /*  [HarmonyPatch(typeof(ServerConfig), "GetIP")]
+          [HarmonyPatch(typeof(ServerConfig), "GetIP")]
           [HarmonyPrefix]
           public static void GetIPPrefix()
           {
@@ -193,21 +178,7 @@ namespace TestMod
               MelonLogger.Msg(__result);
           }
 
-          // Similar patches for other methods...
-          // Patch for fayezIP property getter
-          [HarmonyPatch(typeof(ServerConfig), "fayezIP", MethodType.Getter)]
-          [HarmonyPrefix]
-          public static void FayezIPGetterPrefix()
-          {
-              MelonLogger.Msg("Before getting fayezIP");
-          }
-
-          [HarmonyPatch(typeof(ServerConfig), "fayezIP", MethodType.Getter)]
-          [HarmonyPostfix]
-          public static void FayezIPGetterPostfix(string __result)
-          {
-              MelonLogger.Msg($"After getting fayezIP: {__result}");
-          }
+         
 
           // Patch for localIP property getter
           [HarmonyPatch(typeof(ServerConfig), "localIP", MethodType.Getter)]
@@ -237,12 +208,10 @@ namespace TestMod
           [HarmonyPostfix]
           public static void HttpURLGetterPostfix(string __result)
           {
-              // Override the result
-              __result = "http://localhost:8080";
+            MelonLogger.Msg("Original GetIP result: " + __result);
+            __result = "http://localhost:8080";
 
-              // If you're using MelonLoader for modding Unity games, you might have MelonLogger for logging
-              MelonLogger.Msg("Original GetIP result: " + __result);
-              MelonLogger.Msg("New GetIP result: http://127.0.0.1:8080");
+            MelonLogger.Msg("New GetIP result: http://127.0.0.1:8080");
           }
 
           // Patch for socketURL property getter
@@ -260,7 +229,7 @@ namespace TestMod
               MelonLogger.Msg($"After getting socketURL: {__result}");
           }
 
-        */
+    
 
     }
 
@@ -353,7 +322,7 @@ namespace TestMod
     public class ServerResponsePatch
     {
 
-        /* [HarmonyPatch(typeof(ServerResponse), "get_IsFaulty")]
+         [HarmonyPatch(typeof(ServerResponse), "get_IsFaulty")]
          static void Postfix(ref bool __result)
          {
              MelonLogger.Msg($"Original IsOk result: {__result}");
@@ -361,9 +330,9 @@ namespace TestMod
              // Change __result to whatever value you want, like false to indicate no fault.
              __result = false;
          }
-        */
+        
 
-        [HarmonyPatch("get_IsOk"), HarmonyPostfix]
+        [HarmonyPatch("get_IsOk"), HarmonyPrefix]
         public static void IsOkPostfix(ServerResponse __instance, ref bool __result)
         {
             // Log the original result and any relevant information from the instance.
@@ -467,17 +436,12 @@ namespace TestMod
              Console.WriteLine("UserSignedOut method called");
              return true; // return true to continue executing the original method
          }*/
-        [HarmonyPatch(typeof(Purchaser), "_get_IsAnySubscriptionActive_b__21_0")]
-        [HarmonyPrefix]
-        public static bool Prefix(ProductInfo x)
-        {
-            // Your logging or handling code here
-            MelonLogger.Msg("x:"+ x);
-            return true;
-        }
+  
+        // Your namespace here
 
        
-        
+
+
 
     }
 
@@ -629,28 +593,11 @@ namespace TestMod
 
             // UserFlowUI.instance.ShowMidiRecordingImportScreen();
 
-            UserAuth.instance.CreateUser("john.pope@wweevv.app", "12341234", "jp");
-            UserAuth.instance.enabled = true;
-            PurchaseManager.instance.isPaying = true;
-            
-            //MelonLogger.Msg("------------------Firebase.FirebaseApp.DefaultInstance:"+ FirebaseApp.AppSetDefaultConfigPath()//.DefaultInstance.name);
-         //   Firebase.FirebaseApp.
-          ///  Purchaser.instance.
-          ///  
-           // UserAuth.instance.FinalizeSignIn("jp");
-
-          //  UserAuth.instance.
-            // MelonLogger.Msg("------------------ MidiRecorder.instance:" + MidiRecorder.instance);
-            //   ConcertCreator.instance.userSignedIn();
-              UserFlowUI.instance.UserSignedIn();
+      
          //   UserFlowUI.instance.OpenFileChoosingScreen();
             
             MelonLogger.Msg("------------------DestroyView");
-           GameObject[] gObjects =  ConcertCreator.instance.HideLogInMenuButtons;
-
-            foreach (GameObject go in gObjects) {
-                MelonLogger.Msg("hidden: " + go.name);
-            }
+       
             foreach (UnityEngine.GameObject obj in GameObject.FindObjectsOfType<UnityEngine.GameObject>().ToList())
 
             {
@@ -674,26 +621,12 @@ namespace TestMod
                
 
 
-                Canvas canvas = obj.GetComponentInParent<Canvas>();
+               /* Canvas canvas = obj.GetComponentInParent<Canvas>();
                 CanvasGroup group = obj.GetComponentInParent<CanvasGroup>();
                 try
                 {
 
-                    // add debug label
-                   /* GameObject label = new GameObject("Label");
-                    label.transform.SetParent(obj.transform);
-
-                    Text text = label.AddComponent<Text>();
-                    text.text = obj.name;
-                    text.color = Color.black;
-
-                    // Set up border (using UI Image)
-                    Image border = label.AddComponent<Image>();
-                    border.color = Color.white;  // Set your border color here
-
-                    // Adjust the position and size
-                    label.transform.localPosition = Vector3.zero; // or any position you prefer
-                                                                  // Set other properties like size, font, alignment as needed*/
+ 
                     MelonLogger.Msg("    Sorting Layer: " + canvas.sortingLayerName);
                     MelonLogger.Msg("    Sorting Order: " + canvas.sortingOrder);
                     if (group != null)
@@ -711,22 +644,17 @@ namespace TestMod
                     Color color = renderer.material.color;
                     color.a = 0.5f; // Set alpha to 50%. Adjust as needed.
                     renderer.material.color = color;
-                }
+                }*/
 
 
 
 
 
-                /*
-                   // REPLACE SCENE
-                   for (int i = 0; i < SceneManager.sceneCount; i++)
-                   {
-                       Scene scene = SceneManager.GetSceneAt(i);
-                       MelonLogger.Msg("Loaded scene: " + scene.name);
-                   }
+                
+                 
                    //AvailableScenes
-                   MelonLogger.Msg("SceneManager.GetActiveScene().name: " + SceneManager.GetActiveScene().name);
-                   try
+                  // MelonLogger.Msg("SceneManager.GetActiveScene().name: " + SceneManager.GetActiveScene().name);
+                 /*  try
                    {
 
                        SceneLoader.LoadSceneAsync(i, true);
@@ -755,9 +683,15 @@ namespace TestMod
 
 
             }
-
-
-            GameObject alertView = GameObject.Find("UIAlertView");
+          /*  GameObject subscription = GameObject.Find("ActivateSubscription");
+            if (subscription != null)
+            {
+                // Perform operations on alertView here
+                // For example, to disable it:
+                subscription.SetActive(false);
+            }*/
+            
+           GameObject alertView = GameObject.Find("UIAlertView");
             if (alertView != null)
             {
                 // Perform operations on alertView here
@@ -767,6 +701,8 @@ namespace TestMod
             /*
             Scene active = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
             MelonLogger.Msg("destroy active: " + active);
+
+
             CanvasFinder cf = new CanvasFinder();
             Canvas currentCanvas = cf.GetCurrentCanvas();
             if (currentCanvas != null)
@@ -848,6 +784,7 @@ namespace TestMod
         public override void OnSceneWasInitialized(int buildindex, string sceneName) // Runs when a Scene has Initialized and is passed the Scene's Build Index and Name.
         {
             MelonLogger.Msg("STEP 2.  OnSceneWasInitialized: " + buildindex.ToString() + " | " + sceneName);
+            //AppManager.instance.advancedFeatures = true;
             //AppLauncher.instance.StopShowingSlidingScreen();
             //LogAllMembers(AppLauncher.instance);
             User userAuth = new User();
@@ -860,14 +797,55 @@ namespace TestMod
             userAuth.fullAccess = true;
 
             UserAuth.instance.user = userAuth;
+            UserAuth.instance.enabled = true;
+
+            PurchaseManager.instance.isPaying = true;
+           AppManager.instance.isRetailDemo = true;
+
+            //MelonLogger.Msg("------------------Firebase.FirebaseApp.DefaultInstance:"+ FirebaseApp.AppSetDefaultConfigPath()//.DefaultInstance.name);
+            //   Firebase.FirebaseApp.
+            ///  Purchaser.instance.
+            ///  
+            // UserAuth.instance.FinalizeSignIn("jp");
+
+            //  UserAuth.instance.
+            // MelonLogger.Msg("------------------ MidiRecorder.instance:" + MidiRecorder.instance);
+            //   ConcertCreator.instance.userSignedIn();
+            UserFlowUI.instance.UserSignedIn();
+            UserFlowUI.instance.welcomeScreen.SetActive(false);
+
+           // ConcertCreator.instance.
             // UserAuth.instance.FinalizeSignIn("jp");
             //EnhancedEvent myEvent = new EnhancedEvent();
             //LogAllMembers(myEvent);
             ServerLoaderManager.instance.SubscriptionChecked(true);
 
-            UserFlowUI.instance.ShowLinkImportScreen();
+            Purchaser purchaser = new Purchaser();
+         //   purchaser.products = new List<Product>();
+           ProductInfo productInfo = new ProductInfo();
+            productInfo.iOSID = "123";
+            productInfo.unityID = "1234";
+            productInfo.googleID = "123";
+            //1. fudge a subscricption / apple receipt...
+            // 2. 
+          //  productInfo.subscriptionInfo = new SubscriptionInfo()
 
+            ProductType mType = new ProductType();
+            
+            productInfo.type = mType ;
+;
 
+            //info.product = productInfo;
+
+            //productInfo.subscriptionInfo =  
+            //  purchaser.products = new Array(productInfo);
+            PurchaseManager.instance.isPaying = true;
+            PurchaseManager.instance.SubscriptionChecked(true);
+      
+
+            //UserFlowUI.instance.ShowLinkImportScreen(); // youtube import
+           // UserFlowUI.instance.ShowFileImportScreen();
+           UserFlowUI.instance.ShowMidiRecordingImportScreen();
             try
             {
                 DebugView();
